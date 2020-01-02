@@ -1,0 +1,19 @@
+{
+    "name": "xuezhitech/tp5-wx-mini",
+    "description": "微信小程序后台接口",
+    "authors": [
+        {
+            "name": "xuezhitech",
+            "email": "jinxuezhi@xuezhi.info"
+        }
+    ],
+    "license": "Apache-2.0",
+    "require": {
+    	"topthink/framework": "5.1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "xuezhitech\\wx\\": "src/"
+        }
+    }
+}
