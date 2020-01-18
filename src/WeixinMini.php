@@ -18,7 +18,8 @@ class WeixinMini
 
     protected $result = [
         'status'=>false,
-        'msg'=>''
+        'msg'=>'',
+        'data'=>[]
     ];
 
     public function __construct( $config=[] ){
@@ -26,10 +27,26 @@ class WeixinMini
     }
 
     /**
+     *小程序 - 获得用户手机号
+     */
+    public function getUserPhone($encryptedData,$iv,$session_key){
+        $wxBizDataCrypt = new WeixinBizDataCrypt($this->config['appid'], $session_key);
+        return $wxBizDataCrypt->decryptData($encryptedData, $iv);
+    }
+
+    /**
+     *小程序 - check用户openid
+     */
+    public function checkUserOpenId($encryptedData,$iv,$session_key){
+        $wxBizDataCrypt = new WeixinBizDataCrypt($this->config['appid'], $session_key);
+        return $wxBizDataCrypt->decryptData($encryptedData, $iv);
+    }
+
+    /**
      *小程序 - 用户登录
      *$code - 调用wx.login() 获取 临时登录凭证code
      */
-    public function AuthCode2Session($code){
+    public function authCode2Session($code){
         //获得小程序-登陆后的code
         if ( empty($code) ) {
             $this->result['msg'] = 'code不能为空';
@@ -41,7 +58,10 @@ class WeixinMini
                '&secret='.$this->config['secret'].
                '&js_code='.$code.
                '&grant_type='.$this->config['grant_type'];
-        return json_decode($this->getCurlInfo($url),true);
+        $result = json_decode($this->getCurlInfo($url),true);
+        $this->result['status'] = true;
+        $this->result['data'] = $result;
+        return $this->result;
     }
 
     private function getCurlInfo($url){
