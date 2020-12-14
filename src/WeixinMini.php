@@ -27,6 +27,22 @@ class WeixinMini
     }
 
     /**
+     *小程序 - subscribeMessage.send
+     */
+    public function subscribeMessage($token,$data){
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token='.$token;
+        return json_decode($this->getCurlInfo($url,'POST','',$data),true);
+    }
+
+    /**
+     *小程序 - 获取小程序全局唯一后台接口调用凭据（access_token）
+     */
+    public function getAccessToken(){
+        $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.$this->config['appid'].'&secret='.$this->config['secret'];
+        return json_decode($this->getCurlInfo($url,'GET','',''),true);
+    }
+
+    /**
      *小程序 - 获得用户手机号
      */
     public function getUserPhone($encryptedData,$iv,$session_key){
@@ -54,21 +70,31 @@ class WeixinMini
         }
         //请求auth.code2Session接口
         $url = 'https://api.weixin.qq.com/sns/jscode2session'.
-               '?appid='.$this->config['appid'].
-               '&secret='.$this->config['secret'].
-               '&js_code='.$code.
-               '&grant_type='.$this->config['grant_type'];
-        $result = json_decode($this->getCurlInfo($url),true);
+            '?appid='.$this->config['appid'].
+            '&secret='.$this->config['secret'].
+            '&js_code='.$code.
+            '&grant_type='.$this->config['grant_type'];
+        $result = json_decode($this->getCurlInfo($url,'GET','',''),true);
         $this->result['status'] = true;
         $this->result['data'] = $result;
         return $this->result;
     }
 
-    private function getCurlInfo($url){
+    private function getCurlInfo($url,$type='GET',$headers=[],$data=[]){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, false);
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        if ( $headers ) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        if ( $type=='POST' ){
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        }
         $response = curl_exec($ch);
         curl_close($ch);
         return $response;
