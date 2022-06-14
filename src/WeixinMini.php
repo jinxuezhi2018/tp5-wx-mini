@@ -45,9 +45,23 @@ class WeixinMini
     /**
      *小程序 - 获得用户手机号
      */
-    public function getUserPhone($encryptedData,$iv,$session_key){
-        $wxBizDataCrypt = new WeixinBizDataCrypt($this->config['appid'], $session_key);
-        return $wxBizDataCrypt->decryptData($encryptedData, $iv);
+    public function getUserPhone($code){
+        $token = $this->getAccessToken();
+        if ( $token ) {
+            $data = [
+                'code'=>$code
+            ];
+            $headers = [
+                'Accept'=>'application/json',
+                'Content-type'=>'application/json'
+            ];
+            $url = 'https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token='.$token['access_token'];
+            return json_decode($this->getCurlInfo($url,'POST',$headers,json_encode($data)),true);
+        }else{
+            $this->result['status'] = false;
+            $this->result['data'] = '调用获得用户手机号接口失败';
+            return $this->result;
+        }
     }
 
     /**
