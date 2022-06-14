@@ -47,6 +47,7 @@ class WeixinMini
      */
     public function getUserPhone($encryptedData,$iv,$session_key){
         $wxBizDataCrypt = new WeixinBizDataCrypt($this->config['appid'], $session_key);
+
         return $wxBizDataCrypt->decryptData($encryptedData, $iv);
     }
 
