@@ -94,6 +94,26 @@ class WeixinMini
         return $this->result;
     }
 
+    /**
+     * 小程序 - 获取关联服务号素材列表
+     * type 素材的类型，图片（image）、视频（video）、语音 （voice）、图文（news）
+     * offset 从全部素材的该偏移位置开始返回，0表示从第一个素材 返回
+     * count 返回素材的数量，取值在1到20之间
+     */
+    public function getFreepublish($access_token,$offset=0,$count=10,$no_content=0){
+
+        $url = 'https://api.weixin.qq.com/cgi-bin/freepublish/batchget?access_token='.$access_token;
+        $data = [
+            'offset'=>$offset,
+            'count'=>$count,
+            'no_content'=>$no_content
+        ];
+        $result = json_decode($this->getCurlInfo($url,'POST','',json_encode($data)),true);
+        $this->result['status'] = true;
+        $this->result['data'] = $result;
+        return $this->result;
+    }
+
     private function getCurlInfo($url,$type='GET',$headers=[],$data=[]){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
